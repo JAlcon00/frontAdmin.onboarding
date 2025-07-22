@@ -1,0 +1,292 @@
+/* Sistema de temas para el admin de onboarding digital */
+
+:root {
+  /* ====== TEMA CLARO (por defecto) ====== */
+  
+  /* Colores base */
+  --color-background: #ffffff;
+  --color-surface: #f8fafc;
+  --color-surface-hover: #f1f5f9;
+  --color-surface-active: #e2e8f0;
+  
+  /* Sidebar */
+  --color-sidebar-bg: #1e293b;
+  --color-sidebar-text: #cbd5e1;
+  --color-sidebar-text-active: #ffffff;
+  --color-sidebar-item-hover: #334155;
+  --color-sidebar-item-active: #3b82f6;
+  
+  /* Header */
+  --color-header-bg: #ffffff;
+  --color-header-border: #e2e8f0;
+  --color-header-text: #1e293b;
+  
+  /* Cards */
+  --color-card-bg: #ffffff;
+  --color-card-border: #e2e8f0;
+  --color-card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  
+  /* Texto */
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-text-muted: #94a3b8;
+  
+  /* Estados */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: #dbeafe;
+  
+  --color-success: #10b981;
+  --color-success-light: #d1fae5;
+  
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  
+  --color-error: #ef4444;
+  --color-error-light: #fee2e2;
+  
+  --color-info: #06b6d4;
+  --color-info-light: #cffafe;
+  
+  /* Inputs */
+  --color-input-bg: #ffffff;
+  --color-input-border: #d1d5db;
+  --color-input-border-focus: #3b82f6;
+  --color-input-text: #1e293b;
+  
+  /* Botones */
+  --color-button-primary: #3b82f6;
+  --color-button-primary-hover: #2563eb;
+  --color-button-secondary: #6b7280;
+  --color-button-secondary-hover: #4b5563;
+  
+  /* Tablas */
+  --color-table-header: #f8fafc;
+  --color-table-border: #e2e8f0;
+  --color-table-row-hover: #f8fafc;
+  
+  /* Modales */
+  --color-modal-bg: #ffffff;
+  --color-modal-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Scrollbar */
+  --color-scrollbar: #cbd5e1;
+  --color-scrollbar-track: #f1f5f9;
+}
+
+/* ====== TEMA OSCURO ====== */
+[data-theme="dark"] {
+  /* Colores base */
+  --color-background: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-hover: #334155;
+  --color-surface-active: #475569;
+  
+  /* Sidebar */
+  --color-sidebar-bg: #020617;
+  --color-sidebar-text: #94a3b8;
+  --color-sidebar-text-active: #ffffff;
+  --color-sidebar-item-hover: #1e293b;
+  --color-sidebar-item-active: #3b82f6;
+  
+  /* Header */
+  --color-header-bg: #1e293b;
+  --color-header-border: #334155;
+  --color-header-text: #f8fafc;
+  
+  /* Cards */
+  --color-card-bg: #1e293b;
+  --color-card-border: #334155;
+  --color-card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  
+  /* Texto */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  
+  /* Estados (mantienen colores pero ajustan fondos) */
+  --color-primary-light: #1e3a8a;
+  --color-success-light: #064e3b;
+  --color-warning-light: #78350f;
+  --color-error-light: #7f1d1d;
+  --color-info-light: #164e63;
+  
+  /* Inputs */
+  --color-input-bg: #334155;
+  --color-input-border: #475569;
+  --color-input-border-focus: #3b82f6;
+  --color-input-text: #f8fafc;
+  
+  /* Tablas */
+  --color-table-header: #334155;
+  --color-table-border: #475569;
+  --color-table-row-hover: #334155;
+  
+  /* Modales */
+  --color-modal-bg: #1e293b;
+  --color-modal-overlay: rgba(0, 0, 0, 0.8);
+  
+  /* Scrollbar */
+  --color-scrollbar: #475569;
+  --color-scrollbar-track: #334155;
+}
+
+/* ====== APLICACIÓN DE VARIABLES ====== */
+
+/* Cuerpo de la aplicación */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Animaciones suaves */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Clases utilitarias para temas */
+.bg-surface { 
+  background-color: var(--color-surface); 
+}
+
+.bg-surface-hover:hover { 
+  background-color: var(--color-surface-hover); 
+}
+
+.bg-card { 
+  background-color: var(--color-card-bg); 
+}
+
+.border-card { 
+  border-color: var(--color-card-border); 
+}
+
+.text-primary { 
+  color: var(--color-text-primary); 
+}
+
+.text-secondary { 
+  color: var(--color-text-secondary); 
+}
+
+.text-muted { 
+  color: var(--color-text-muted); 
+}
+
+/* Estados de completitud con variables */
+.completitud-alta { 
+  background-color: var(--color-success-light); 
+  color: var(--color-success); 
+}
+
+.completitud-media { 
+  background-color: var(--color-warning-light); 
+  color: var(--color-warning); 
+}
+
+.completitud-baja { 
+  background-color: var(--color-error-light); 
+  color: var(--color-error); 
+}
+
+/* Estados de solicitudes */
+.estatus-iniciada { 
+  background-color: var(--color-info-light); 
+  color: var(--color-info); 
+}
+
+.estatus-en-revision { 
+  background-color: var(--color-warning-light); 
+  color: var(--color-warning); 
+}
+
+.estatus-aprobada { 
+  background-color: var(--color-success-light); 
+  color: var(--color-success); 
+}
+
+.estatus-rechazada { 
+  background-color: var(--color-error-light); 
+  color: var(--color-error); 
+}
+
+.estatus-cancelada { 
+  background-color: var(--color-text-muted); 
+  color: var(--color-text-secondary); 
+}
+
+/* Clases adicionales para el header */
+.bg-header-bg { 
+  background-color: var(--color-header-bg); 
+}
+
+.border-header-border { 
+  border-color: var(--color-header-border); 
+}
+
+.text-header-text { 
+  color: var(--color-header-text); 
+}
+
+/* Clases para sidebar */
+.bg-sidebar-bg { 
+  background-color: var(--color-sidebar-bg); 
+}
+
+.text-sidebar-text { 
+  color: var(--color-sidebar-text); 
+}
+
+.text-sidebar-text-active { 
+  color: var(--color-sidebar-text-active); 
+}
+
+.bg-sidebar-item-hover:hover { 
+  background-color: var(--color-sidebar-item-hover); 
+}
+
+.bg-sidebar-item-active { 
+  background-color: var(--color-sidebar-item-active); 
+}
+
+/* Clases para tablas */
+.bg-table-header { 
+  background-color: var(--color-table-header); 
+}
+
+.border-table-border { 
+  border-color: var(--color-table-border); 
+}
+
+.divide-table-border > :not([hidden]) ~ :not([hidden]) { 
+  border-color: var(--color-table-border); 
+}
+
+.hover\\:bg-table-row-hover:hover { 
+  background-color: var(--color-table-row-hover); 
+}
+
+/* Sombras para cards */
+.shadow-card { 
+  box-shadow: var(--color-card-shadow); 
+}
