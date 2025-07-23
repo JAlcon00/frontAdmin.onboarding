@@ -1,37 +1,52 @@
 import React from 'react';
 import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import type { Usuario } from '../../hook/usuario';
+import { useUsuarioManager } from '../../hook/usuario/useUsuarioManager';
 
-interface UsuarioActionsProps {
-  usuario: Usuario;
-  onView?: (usuario: Usuario) => void;
-  onEdit?: (usuario: Usuario) => void;
-  onDelete?: (usuario: Usuario) => void;
-}
+const UsuarioActions: React.FC<{ usuarioId: number }> = ({ usuarioId }) => {
 
-export const UsuarioActions: React.FC<UsuarioActionsProps> = ({ usuario, onView, onEdit, onDelete }) => {
+  const { state, obtenerUsuario, eliminarUsuario } = useUsuarioManager({ autoLoad: false });
+  const usuario = state.usuarios.find(u => u.usuario_id === usuarioId);
+
+  const handleView = async () => {
+    await obtenerUsuario(usuarioId);
+    // Aquí podrías abrir un modal o mostrar detalles
+  };
+
+
+  const handleEdit = async () => {
+    await obtenerUsuario(usuarioId);
+    // Aquí podrías abrir un formulario de edición
+  };
+
+  const handleDelete = async () => {
+    await eliminarUsuario(usuarioId);
+    // Aquí podrías mostrar una notificación o refrescar la lista
+  };
+
+  if (!usuario) return null;
+
   return (
-    <div className="flex items-center justify-center space-x-2">
+    <div className="flex space-x-2">
       <button
-        onClick={() => onView?.(usuario)}
-        className="p-1 rounded hover:bg-gray-100"
-        title="Ver"
+        className="text-blue-500 hover:text-blue-700"
+        onClick={handleView}
+        title="Ver usuario"
       >
-        <EyeIcon className="w-5 h-5 text-blue-600" />
+        <EyeIcon className="h-5 w-5" />
       </button>
       <button
-        onClick={() => onEdit?.(usuario)}
-        className="p-1 rounded hover:bg-gray-100"
-        title="Editar"
+        className="text-yellow-500 hover:text-yellow-700"
+        onClick={handleEdit}
+        title="Editar usuario"
       >
-        <PencilIcon className="w-5 h-5 text-yellow-600" />
+        <PencilIcon className="h-5 w-5" />
       </button>
       <button
-        onClick={() => onDelete?.(usuario)}
-        className="p-1 rounded hover:bg-gray-100"
-        title="Eliminar"
+        className="text-red-500 hover:text-red-700"
+        onClick={handleDelete}
+        title="Eliminar usuario"
       >
-        <TrashIcon className="w-5 h-5 text-red-600" />
+        <TrashIcon className="h-5 w-5" />
       </button>
     </div>
   );
