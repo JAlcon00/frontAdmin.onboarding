@@ -1,7 +1,8 @@
-import React from 'react';
-import { Dashboard } from '../components/Dashboard/Dashboard';
 
-export const DashboardPage: React.FC = () => {
+import { Dashboard } from '../components/Dashboard/Dashboard';
+import { MainLayout } from '../layout/MainLayout';
+
+export function DashboardPage() {
   // Handlers para las acciones del dashboard
   const handleViewAllSolicitudes = () => {
     console.log('Ver todas las solicitudes');
@@ -55,19 +56,21 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <Dashboard
-      onViewAllSolicitudes={handleViewAllSolicitudes}
-      onViewSolicitud={handleViewSolicitud}
-      onEditSolicitud={handleEditSolicitud}
-      onNuevoCliente={handleNuevoCliente}
-      onNuevoDocumento={handleNuevoDocumento}
-      onNuevaSolicitud={handleNuevaSolicitud}
-      onVerClientes={handleVerClientes}
-      onVerReportes={handleVerReportes}
-      onConfiguracion={handleConfiguracion}
-      onVerTodasActividades={handleVerTodasActividades}
-    />
+    <MainLayout>
+      <Dashboard
+        onViewAllSolicitudes={handleViewAllSolicitudes}
+        onViewSolicitud={handleViewSolicitud}
+        onEditSolicitud={handleEditSolicitud}
+        onNuevoCliente={handleNuevoCliente}
+        onNuevoDocumento={handleNuevoDocumento}
+        onNuevaSolicitud={handleNuevaSolicitud}
+        onVerClientes={handleVerClientes}
+        onVerReportes={handleVerReportes}
+        onConfiguracion={handleConfiguracion}
+        onVerTodasActividades={handleVerTodasActividades}
+      />
+    </MainLayout>
   );
-};
+}
 
 export default DashboardPage;

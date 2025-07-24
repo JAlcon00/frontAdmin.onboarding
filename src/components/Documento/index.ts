@@ -5,16 +5,15 @@ export { DocumentoFilters } from './DocumentoFilters';
 export { DocumentoForm } from './DocumentoForm';
 export { DocumentoDetail } from './DocumentoDetail';
 export { DocumentoStats as DocumentoStatsComponent } from './DocumentoStats';
-
-// Nuevos componentes agregados para completar el módulo
 export { DocumentoUpload as DocumentoUploadComponent } from './DocumentoUpload';
 export { DocumentoValidaciones } from './DocumentoValidaciones';
 export { DocumentoViewer } from './DocumentoViewer';
 export { DocumentoRevision as DocumentoRevisionComponent } from './DocumentoRevision';
 
+
 // Re-exportar tipos principales
-export type { 
-  Documento,
+export type {
+  Documento as DocumentoType,
   DocumentoTipo,
   DocumentoCreation,
   DocumentoUpdate,

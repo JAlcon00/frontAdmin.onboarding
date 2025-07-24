@@ -1,93 +1,58 @@
-//Implemeentación de la lista de usuarios 
-/*
-Se importara el hook de usuarios y los componentes necesarios para mostrar la lista de usuarios.
-*/
-import React, { useState } from 'react';
-import { useUsuarioManager } from '../../hook/usuario/useUsuarioManager';
-import UsuarioActions from './UsuarioActions';
-import UsuarioDetail from './UsuarioDetail';
-import UsuarioPasswordModal from './UsuarioPasswordModal';
+import React from 'react';
+import type { Usuario } from '../../hook/usuario/useUsuarioManager';
+import { Button, Badge } from '../shared';
 
+export interface UsuarioActionHandlers {
+  onVerDetalle: (usuario: Usuario) => void;
+  onEditar: (usuario: Usuario) => void;
+  onResetPassword: (usuario: Usuario) => void;
+  onEliminar: (usuario: Usuario) => void;
+}
 
-const UsuarioList: React.FC = () => {
-    const { state } = useUsuarioManager({ autoLoad: true });
-    const [selectedUsuarioId, setSelectedUsuarioId] = useState<number | null>(null);
-    const [showDetail, setShowDetail] = useState(false);
-    const [showPasswordModal, setShowPasswordModal] = useState(false);
+export interface UsuarioListProps {
+  usuarios: Usuario[];
+  actions: UsuarioActionHandlers;
+  loading?: boolean;
+}
 
-
-    const handleView = (userId: number) => {
-        setSelectedUsuarioId(userId);
-        setShowDetail(true);
-    };
-
-    const handleCloseDetail = () => {
-        setShowDetail(false);
-        setSelectedUsuarioId(null);
-    };
-
-    const handlePasswordChange = (userId: number) => {
-        setSelectedUsuarioId(userId);
-        setShowPasswordModal(true);
-    };
-
-    const handleClosePasswordModal = () => {
-        setShowPasswordModal(false);
-        setSelectedUsuarioId(null);
-    };
-
-    return (
-        <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Lista de Usuarios</h2>
-            <table className="min-w-full bg-white border border-gray-200">
-                <thead>
-                    <tr>
-                        <th className="px-4 py-2 border-b">ID</th>
-                        <th className="px-4 py-2 border-b">Nombre</th>
-                        <th className="px-4 py-2 border-b">Usuario</th>
-                        <th className="px-4 py-2 border-b">Correo</th>
-                        <th className="px-4 py-2 border-b">Rol</th>
-                        <th className="px-4 py-2 border-b">Estatus</th>
-                        <th className="px-4 py-2 border-b">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {state.usuarios.map(usuario => (
-                        <tr key={usuario.usuario_id}>
-                            <td className="px-4 py-2 border-b">{usuario.usuario_id}</td>
-                            <td className="px-4 py-2 border-b">{usuario.nombre} {usuario.apellido}</td>
-                            <td className="px-4 py-2 border-b">{usuario.username}</td>
-                            <td className="px-4 py-2 border-b">{usuario.correo}</td>
-                            <td className="px-4 py-2 border-b">{usuario.rol}</td>
-                            <td className="px-4 py-2 border-b">{usuario.estatus}</td>
-                            <td className="px-4 py-2 border-b">
-                                <UsuarioActions usuarioId={usuario.usuario_id} />
-                                <button
-                                    onClick={() => handleView(usuario.usuario_id)}
-                                    className="text-blue-500 hover:text-blue-700 ml-2"
-                                >
-                                    Ver
-                                </button>
-                                <button
-                                    onClick={() => handlePasswordChange(usuario.usuario_id)}
-                                    className="text-green-500 hover:text-green-700 ml-2"
-                                >
-                                    Cambiar Contraseña
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            {/* Modal de detalle de usuario */}
-            
-
-            {/* Modal de cambio/restauración de contraseña */}
-            
-        </div>
-    );
-                                
+const UsuarioList: React.FC<UsuarioListProps> = ({ usuarios, actions, loading }) => {
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white dark:bg-gray-800 rounded shadow">
+        <thead>
+          <tr>
+            <th className="px-4 py-2">ID</th>
+            <th className="px-4 py-2">Nombre</th>
+            <th className="px-4 py-2">Usuario</th>
+            <th className="px-4 py-2">Correo</th>
+            <th className="px-4 py-2">Rol</th>
+            <th className="px-4 py-2">Estatus</th>
+            <th className="px-4 py-2">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usuarios.map(usuario => (
+            <tr key={usuario.usuario_id} className="border-b">
+              <td className="px-4 py-2">{usuario.usuario_id}</td>
+              <td className="px-4 py-2">{usuario.nombre} {usuario.apellido}</td>
+              <td className="px-4 py-2">{usuario.username}</td>
+              <td className="px-4 py-2">{usuario.correo}</td>
+              <td className="px-4 py-2"><Badge variant="primary">{usuario.rol}</Badge></td>
+              <td className="px-4 py-2"><Badge variant={usuario.estatus === 'activo' ? 'success' : 'danger'}>{usuario.estatus}</Badge></td>
+              <td className="px-4 py-2 flex gap-2 flex-wrap">
+                <Button size="xs" variant="secondary" onClick={() => actions.onVerDetalle(usuario)}>Ver</Button>
+                <Button size="xs" variant="primary" onClick={() => actions.onEditar(usuario)}>Editar</Button>
+                <Button size="xs" variant="warning" onClick={() => actions.onResetPassword(usuario)}>Reset Pass</Button>
+                <Button size="xs" variant="danger" onClick={() => actions.onEliminar(usuario)}>Eliminar</Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {loading && <div className="text-center py-4">Cargando usuarios...</div>}
+      {!loading && usuarios.length === 0 && <div className="text-center py-4 text-gray-500">No hay usuarios para mostrar.</div>}
+    </div>
+  );
 };
 
 export default UsuarioList;

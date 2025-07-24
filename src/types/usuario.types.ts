@@ -9,12 +9,10 @@ export interface Usuario {
   apellido: string;
   username: string;
   correo: string;
-  password_hash: string;
   rol: RolUsuario;
   estatus: EstatusUsuario;
   created_at: Date;
   updated_at: Date;
-  
   // Métodos computados (se calcularán en el frontend)
   nombre_completo?: string;
   esta_activo?: boolean;

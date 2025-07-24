@@ -1,5 +1,6 @@
 import React from 'react';
 import { useUsuarioFilters } from '../../hook/usuario/useUsuarioFilters';
+import { Button } from '../shared';
 
 const UsuarioFilter: React.FC = () => {
   const {
@@ -9,23 +10,32 @@ const UsuarioFilter: React.FC = () => {
     clearFilters,
     getRoleOptions,
     getStatusOptions,
-    applyFilters,
+    getSortOptions,
+    setSortConfig,
+    clearSort
   } = useUsuarioFilters();
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === 'search') setSearchTerm(value);
+    else setFilter(name as any, value || undefined);
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const [field, direction] = e.target.value.split(':');
+    if (field) setSortConfig(field, direction as 'asc' | 'desc');
+    else clearSort();
+  };
+
   return (
-    <form
-      className="flex flex-wrap gap-4 items-end mb-4"
-      onSubmit={e => {
-        e.preventDefault();
-        applyFilters();
-      }}
-    >
+    <form className="flex flex-wrap gap-4 items-end bg-white dark:bg-gray-800 p-4 rounded shadow mb-4">
       <div>
-        <label className="block text-sm font-medium mb-1">Rol</label>
+        <label className="block text-xs font-semibold mb-1">Rol</label>
         <select
-          className="border rounded px-2 py-1"
+          name="rol"
           value={state.activeFilters.rol || ''}
-          onChange={e => setFilter('rol', e.target.value || undefined)}
+          onChange={handleInputChange}
+          className="border rounded px-2 py-1 text-sm"
         >
           <option value="">Todos</option>
           {getRoleOptions().map(opt => (
@@ -34,11 +44,12 @@ const UsuarioFilter: React.FC = () => {
         </select>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Estatus</label>
+        <label className="block text-xs font-semibold mb-1">Estatus</label>
         <select
-          className="border rounded px-2 py-1"
+          name="estatus"
           value={state.activeFilters.estatus || ''}
-          onChange={e => setFilter('estatus', e.target.value || undefined)}
+          onChange={handleInputChange}
+          className="border rounded px-2 py-1 text-sm"
         >
           <option value="">Todos</option>
           {getStatusOptions().map(opt => (
@@ -47,28 +58,36 @@ const UsuarioFilter: React.FC = () => {
         </select>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Buscar</label>
+        <label className="block text-xs font-semibold mb-1">Buscar</label>
         <input
           type="text"
-          className="border rounded px-2 py-1"
+          name="search"
+          value={state.searchTerm}
+          onChange={handleInputChange}
           placeholder="Nombre, usuario, correo..."
-          value={state.activeFilters.search || ''}
-          onChange={e => setSearchTerm(e.target.value)}
+          className="border rounded px-2 py-1 text-sm"
         />
       </div>
-      <button
-        type="submit"
-        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-      >
-        Aplicar
-      </button>
-      <button
-        type="button"
-        className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300"
-        onClick={clearFilters}
-      >
-        Limpiar
-      </button>
+      <div>
+        <label className="block text-xs font-semibold mb-1">Ordenar por</label>
+        <select
+          name="sort"
+          value={state.sortConfig ? `${state.sortConfig.field}:${state.sortConfig.direction}` : ''}
+          onChange={handleSortChange}
+          className="border rounded px-2 py-1 text-sm"
+        >
+          <option value="">Sin orden</option>
+          {getSortOptions().map(opt => (
+            <React.Fragment key={opt.value}>
+              <option value={`${opt.value}:asc`}>{opt.label} (asc)</option>
+              <option value={`${opt.value}:desc`}>{opt.label} (desc)</option>
+            </React.Fragment>
+          ))}
+        </select>
+      </div>
+      <div className="flex gap-2">
+        <Button type="button" variant="secondary" onClick={clearFilters}>Limpiar</Button>
+      </div>
     </form>
   );
 };

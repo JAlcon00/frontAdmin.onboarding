@@ -11,10 +11,10 @@ export * from './Documento';
 export * from './Solicitud';
 
 // Usuario Components
-//export * from './Usuario';
+export * from './Usuario';
 
 // Login Components
-//export * from './Login';
+export * from './Login';
 
 // Shared Components
 export * from './shared';

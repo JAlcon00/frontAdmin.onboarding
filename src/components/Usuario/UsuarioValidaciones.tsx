@@ -1,128 +1,169 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { Button, Badge, Card, LoadingSpinner, ValidationAlert } from '../shared';
+import { useUsuarioManager } from '../../hook/usuario';
 import { useUsuarioValidation } from '../../hook/usuario/useUsuarioValidation';
-import { useUsuarioManager } from '../../hook/usuario/useUsuarioManager';
 
+// Componente principal de validaciones de usuario
 const UsuarioValidaciones: React.FC = () => {
-  const { state: usuarioState } = useUsuarioManager({ autoLoad: true });
-  const { validateUser, getValidationSummary } = useUsuarioValidation();
+  const { state } = useUsuarioManager();
+  const { usuarios, loading } = state;
+  const {
+    validateUserBatch,
+    getValidationSummary,
+    exportValidationResults
+  } = useUsuarioValidation();
 
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [userValidation, setUserValidation] = useState<any>(null);
-  const [batchSummary, setBatchSummary] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [summary, setSummary] = useState<any>(null);
+  const [batchResults, setBatchResults] = useState<Map<number, any>>(new Map());
+  const [processing, setProcessing] = useState(false);
 
-
-  const handleValidateUser = async (userId: number) => {
-    setLoading(true);
-    const user = usuarioState.usuarios.find(u => u.usuario_id === userId);
-    if (user) {
-      // Adaptar campos para validación tipada
-      const userForValidation = {
-        ...user,
-        password_hash: '',
-        created_at: new Date(user.created_at),
-        updated_at: new Date(user.updated_at)
-      };
-      const result = await validateUser(userForValidation);
-      setUserValidation(result);
-      setSelectedUserId(userId);
+  useEffect(() => {
+    if (!loading && usuarios && usuarios.length > 0) {
+      setProcessing(true);
+      // Adaptar fechas a tipo Date para validación
+      const usuariosAdaptados = usuarios.map(u => ({
+        ...u,
+        created_at: new Date(u.created_at),
+        updated_at: new Date(u.updated_at),
+      }));
+      validateUserBatch(usuariosAdaptados).then(results => {
+        setBatchResults(results);
+        getValidationSummary(usuariosAdaptados).then(setSummary);
+        setProcessing(false);
+      });
     }
-    setLoading(false);
-  };
+  }, [usuarios, loading, validateUserBatch, getValidationSummary]);
 
-  const handleBatchValidation = async () => {
-    setLoading(true);
-    // Adaptar campos para validación tipada
-    const usuariosForValidation = usuarioState.usuarios.map(u => ({
-      ...u,
-      password_hash: '',
-      created_at: new Date(u.created_at),
-      updated_at: new Date(u.updated_at)
-    }));
-    const summary = await getValidationSummary(usuariosForValidation);
-    setBatchSummary(summary);
-    setLoading(false);
-  };
+  if (loading || processing) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <LoadingSpinner size="lg" />
+        <span className="ml-3 text-gray-500">Validando usuarios...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Validaciones de Usuarios</h2>
-      <div className="mb-4">
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2"
-          onClick={handleBatchValidation}
-          disabled={loading}
-        >
-          Validar todos los usuarios
-        </button>
+    <Card className="w-full max-w-4xl mx-auto mt-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <ShieldCheckIcon className="h-6 w-6 text-blue-500" />
+          Validación de Usuarios
+        </h2>
+        <Button size="sm" onClick={() => setShowSummary(s => !s)}>
+          {showSummary ? 'Ocultar resumen' : 'Ver resumen'}
+        </Button>
       </div>
-      <div className="mb-6">
-        <h3 className="font-semibold mb-2">Validar usuario individual</h3>
-        <select
-          className="border rounded px-2 py-1 mr-2"
-          value={selectedUserId || ''}
-          onChange={e => handleValidateUser(Number(e.target.value))}
-        >
-          <option value="">Selecciona un usuario</option>
-          {usuarioState.usuarios.map(u => (
-            <option key={u.usuario_id} value={u.usuario_id}>
-              {u.nombre} {u.apellido} ({u.username})
-            </option>
-          ))}
-        </select>
-      </div>
-      {userValidation && selectedUserId && (
-        <div className="mb-6 border rounded p-4 bg-gray-50">
-          <h4 className="font-semibold mb-2">Resultado de validación para usuario #{selectedUserId}</h4>
-          {userValidation.isValid ? (
-            <div className="text-green-700">Usuario válido</div>
-          ) : (
-            <div className="text-red-700">Usuario con errores</div>
-          )}
-          {userValidation.errors.length > 0 && (
-            <ul className="text-red-600 text-sm mt-2">
-              {userValidation.errors.map((err: any, idx: number) => (
-                <li key={idx}>{err.field}: {err.message}</li>
-              ))}
-            </ul>
-          )}
-          {userValidation.warnings.length > 0 && (
-            <ul className="text-yellow-600 text-sm mt-2">
-              {userValidation.warnings.map((warn: any, idx: number) => (
-                <li key={idx}>{warn.field}: {warn.message}</li>
-              ))}
-            </ul>
-          )}
-          {userValidation.suggestions.length > 0 && (
-            <ul className="text-blue-600 text-sm mt-2">
-              {userValidation.suggestions.map((sug: any, idx: number) => (
-                <li key={idx}>{sug.field}: {sug.suggestion}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-      {batchSummary && (
-        <div className="border rounded p-4 bg-gray-100">
-          <h4 className="font-semibold mb-2">Resumen de validación masiva</h4>
-          <div>Total de usuarios: {batchSummary.totalUsers}</div>
-          <div>Usuarios válidos: {batchSummary.validUsers}</div>
-          <div>Usuarios con errores: {batchSummary.usersWithErrors}</div>
-          <div>Usuarios con advertencias: {batchSummary.usersWithWarnings}</div>
-          {batchSummary.commonIssues && batchSummary.commonIssues.length > 0 && (
-            <div className="mt-2">
-              <div className="font-semibold">Problemas comunes:</div>
-              <ul className="list-disc ml-6">
-                {batchSummary.commonIssues.map((issue: any, idx: number) => (
-                  <li key={idx}>{issue.issue} (Afecta a {issue.count} usuarios)</li>
-                ))}
-              </ul>
+
+      {showSummary && summary && (
+        <div className="mb-4">
+          <Card className="bg-gray-50 dark:bg-gray-800">
+            <div className="font-semibold mb-2">Resumen de validación</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+              <Badge variant="primary">Total: {summary.totalUsers}</Badge>
+              <Badge variant="success">Válidos: {summary.validUsers}</Badge>
+              <Badge variant="danger">Errores: {summary.usersWithErrors}</Badge>
+              <Badge variant="warning">Advertencias: {summary.usersWithWarnings}</Badge>
             </div>
-          )}
+            {summary.commonIssues && summary.commonIssues.length > 0 && (
+              <div className="mt-2">
+                <div className="font-medium mb-1">Problemas más comunes:</div>
+                <ul className="list-disc pl-5 text-sm">
+                  {summary.commonIssues.map((issue: any, idx: number) => (
+                    <li key={idx}>
+                      {issue.issue} <span className="text-xs text-gray-500">({issue.count} usuarios)</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </Card>
         </div>
       )}
-    </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead>
+            <tr>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Correo</th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Validación</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-100 dark:divide-gray-800">
+            {usuarios && usuarios.length > 0 && usuarios.map(user => {
+              const result = batchResults.get(user.usuario_id);
+              return (
+                <tr key={user.usuario_id}>
+                  <td className="px-2 py-2 text-xs">{user.usuario_id}</td>
+                  <td className="px-2 py-2 text-xs">{user.username}</td>
+                  <td className="px-2 py-2 text-xs">{user.correo}</td>
+                  <td className="px-2 py-2 text-xs">{user.rol}</td>
+                  <td className="px-2 py-2 text-xs">{user.estatus}</td>
+                  <td className="px-2 py-2">
+                    {result ? (
+                      <div className="space-y-1">
+                        {result.isValid && result.warnings.length === 0 && (
+                          <ValidationAlert type="success" message="Válido" size="sm" dismissible={false} />
+                        )}
+                        {result.errors.length > 0 && (
+                          <ValidationAlert
+                            type="error"
+                            message={`Errores: ${result.errors.length}`}
+                            details={result.errors.map((e: any) => `${e.field}: ${e.message}`)}
+                            size="sm"
+                            dismissible={false}
+                          />
+                        )}
+                        {result.warnings.length > 0 && (
+                          <ValidationAlert
+                            type="warning"
+                            message={`Advertencias: ${result.warnings.length}`}
+                            details={result.warnings.map((w: any) => `${w.field}: ${w.message}`)}
+                            size="sm"
+                            dismissible={false}
+                          />
+                        )}
+                        {result.suggestions.length > 0 && (
+                          <ValidationAlert
+                            type="info"
+                            message={`Sugerencias: ${result.suggestions.length}`}
+                            details={result.suggestions.map((s: any) => `${s.field}: ${s.suggestion}`)}
+                            size="sm"
+                            dismissible={false}
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-xs">Sin datos</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-6 flex justify-end gap-2">
+        <Button size="sm" variant="secondary" onClick={() => {
+          const blob = new Blob([exportValidationResults()], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `usuarios-validacion-${new Date().toISOString()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }}>
+          Exportar resultados
+        </Button>
+      </div>
+    </Card>
   );
 };
 
